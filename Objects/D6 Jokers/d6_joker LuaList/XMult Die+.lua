@@ -1,7 +1,7 @@
 local d6_joker_info = SMODS.D6_Joker({
 	key = "xmult_plus_die",
 	loc_txt = {},
-	discovered = true,
+	discovered = false,
 	d6_sides = {
 		[1] = "mult_minus2_side",
 		[2] = "xmult_side",

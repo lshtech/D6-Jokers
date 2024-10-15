@@ -3,9 +3,8 @@ local tarot_info = SMODS.Consumable({
 	set = "Tarot",
 	loc_txt = {},
 	pos = {x=0, y=0},
-	atlas = "d6_consumables",
 	cost = 3,
-	discovered = true,
+	discovered = false,
 	can_use = function(self, card)
 		local d6_joker_selected = false
 		for k, v in ipairs(G.jokers.cards) do
@@ -34,13 +33,6 @@ local tarot_info = SMODS.Consumable({
 			end
             return true end 
 		}))
-	end,
-	in_pool = function(self)
-		local has_d6_joker
-		for i = 1, #G.jokers.cards do
-			if G.jokers.cards[i].config.center.d6_joker then has_d6_joker = true end
-		end
-		if has_d6_joker == true then return true else return false end
 	end,
 	register = function(self, order)
 		if order and order == self.order then

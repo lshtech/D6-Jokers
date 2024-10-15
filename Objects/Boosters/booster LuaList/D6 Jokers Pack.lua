@@ -3,7 +3,7 @@ local booster_info = SMODS.Booster({
 	weight = 1,
 	cost = 4,
 	config = {extra = 3, choose = 1},
-	discovered = true,
+	discovered = false,
 	create_card = function(self, card)
 		return create_card("d6_jokers", G.pack_cards, nil, nil, true, true, nil, 'dsix_jokers')
 	end,

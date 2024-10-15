@@ -1,7 +1,7 @@
 local d6_joker_info = SMODS.D6_Joker({
 	key = "self_selling_die",
 	loc_txt = {},
-	discovered = true,
+	discovered = false,
 	d6_sides = {
 		[1] = "card_pack_side",
 		[2] = "card_pack_side",
@@ -10,7 +10,6 @@ local d6_joker_info = SMODS.D6_Joker({
 		[5] = "orbital_side",
 		[6] = "orbital_side"
 	},
-	eternal_compat = false,
 	perishable_compat = false,
 	rarity = 2,
 	cost = 6,

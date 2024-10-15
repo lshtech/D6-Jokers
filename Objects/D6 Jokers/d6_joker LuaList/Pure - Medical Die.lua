@@ -1,7 +1,7 @@
 local d6_joker_info = SMODS.D6_Joker({
 	key = "pure_medical_die",
 	loc_txt = {},
-	discovered = true,
+	discovered = false,
 	d6_sides = {
 		[1] = "pure_booster_side",
 		[2] = "pure_quality_care_side",

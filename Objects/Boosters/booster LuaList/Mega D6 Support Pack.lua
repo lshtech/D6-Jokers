@@ -3,7 +3,7 @@ local booster_info = SMODS.Booster({
 	weight = 0.25,
 	cost = 8,
 	config = {extra = 5, choose = 2},
-	discovered = true,
+	discovered = false,
 	create_card = function(self, card)
 		return create_card("d6_consumables", G.pack_cards, nil, nil, true, true, nil, 'dsix_support')
 	end,

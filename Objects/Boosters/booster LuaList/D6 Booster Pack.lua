@@ -3,7 +3,7 @@ local booster_info = SMODS.Booster({
 	weight = 0.8,
 	cost = 6,
 	config = {extra = 4, choose = 1},
-	discovered = true,
+	discovered = false,
 	create_card = function(self, card)
 		local card_to_make = nil
 		if not card.ability.cards_made then card.ability.cards_made = 0 end

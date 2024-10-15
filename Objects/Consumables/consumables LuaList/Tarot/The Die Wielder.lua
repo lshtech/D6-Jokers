@@ -4,7 +4,7 @@ local tarot_info = SMODS.Consumable({
 	loc_txt = {},
 	pos = {x=0, y=0},
 	cost = 3,
-	discovered = true,
+	discovered = false,
 	can_use = function(self, card)
 		if #G.jokers.cards < G.jokers.config.card_limit or self.area == G.jokers then
 			return true
