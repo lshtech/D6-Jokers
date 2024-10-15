@@ -42,7 +42,7 @@ payload = '''
 [[patches]]
 [patches.regex]
 target = 'functions/UI_definitions.lua'
-pattern = 'if AUT\.badges then'
+pattern = '^(?<indent>[\t ]*)if AUT\.badges then'
 position = 'before'
 payload = '''
 			--ADDED CODE FROM D6 JOKERS
@@ -77,8 +77,7 @@ payload = '''
                     })
                 
                 if not card.config.center.omit_d6_sides_desc then
-                    SMODS.compat_0_9_8.generate_UIBox_ability_table_card = card
-                    local D6_AUT = generate_card_ui(SMODS.D6_Sides[card.ability.extra.local_d6_sides[card.ability.extra.selected_d6_face].key], nil, nil, "D6 Side", nil, nil, nil, nil, card)
+                    local D6_AUT = generate_card_ui(SMODS.D6_Sides[card.ability.extra.local_d6_sides[card.ability.extra.selected_d6_face].key], nil, nil, nil, nil, nil, nil, nil, card)
                     AUT.main[#AUT.main+1] = D6_AUT.name
                     for k, v in pairs(D6_AUT.main) do
                         AUT.main[#AUT.main+1] = v

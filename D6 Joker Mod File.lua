@@ -4,7 +4,7 @@
 --- MOD_AUTHOR: [ItsFlowwey]
 --- MOD_DESCRIPTION: Adds D6 Jokers that have their effects determined by a die roll. 
 --- PREFIX: dsix
---- VERSION: 0.7.1
+--- VERSION: 0.7.0
 --- LOADER_VERSION_GEQ: "1.0.0-ALPHA-0721a"
 --- PRIORITY: -900
 
@@ -37,7 +37,6 @@ SMODS.Atlas{key = "d6_side_icons", atlas_table = "ASSET_ATLAS", px = 34, py = 34
 --Object Art
 SMODS.Atlas{key = "d6_jokers", atlas_table = "ASSET_ATLAS", px = 71, py = 95, path = "d6_jokers_atlas.png"}
 SMODS.Atlas{key = "d6_boosters", atlas_table = "ASSET_ATLAS", px = 71, py = 95, path = "d6_boosters.png"}
-SMODS.Atlas{key = "d6_consumables", atlas_table = "ASSET_ATLAS", px = 71, py = 95, path = "d6_consumables.png"}
 SMODS.Atlas{key = "booster_enhancement", atlas_table = "ASSET_ATLAS", px = 71, py = 95, path = "boosted_enhancement.png"}
 --Other
 SMODS.Atlas{key = "modicon", atlas_table = "ASSET_ATLAS", px = 34, py = 34, path = "d6_jokers_mod_tag.png"}
@@ -48,6 +47,38 @@ SMODS.Shader{key = 'polychrome_darken', path = 'polychrome_darken.fs'}
 SMODS.Shader{key = 'holo_darken', path = 'holo_darken.fs'}
 SMODS.Shader{key = 'foil_darken', path = 'foil_darken.fs'}
 SMODS.Shader{key = 'light_foil', path = 'd6_side_foil.fs'}
+
+--[[
+SMODS.ConsumableType { 
+    key = 'D6 Side',
+    collection_rows = { 4,5 },
+    primary_colour = HEX("e16363"),
+    secondary_colour = HEX("e16363"),
+    shop_rate = 0,
+    loc_txt = {
+        collection = 'D6 Side',
+        name = 'D6 Sides',
+        label = 'D6 Sides',
+        undiscovered = {
+			name = "Not Discovered",
+			text = {
+				"Purchase or use",
+                "this card in an",
+                "unseeded run to",
+                "learn what it does"
+			},
+		},
+    },
+}]]
+
+
+local unknown = SMODS.UndiscoveredSprite {
+    key = 'Sides',
+    atlas = 'sides',
+    pos = {x = 0, y = 0}
+}
+
+
 
 -- SMODS.D6_Sides API. 
 SMODS.D6_Sides = {}
@@ -124,9 +155,10 @@ SMODS.D6_Side = SMODS.GameObject:extend {
 		specific_vars }
 		local res = {}
 		if self.loc_vars and type(self.loc_vars) == 'function' then
-			res = self:loc_vars(info_queue, card, card.ability.extra.local_d6_sides[card.ability.extra.selected_d6_face])
-			target.vars = res.vars or target.vars
-			target.key = res.key or target.key
+			print(card.name)
+			--res = self:loc_vars(info_queue, card, card.ability.extra.local_d6_sides[card.ability.extra.selected_d6_face])
+			--target.vars = res.vars or target.vars
+			--target.key = res.key or target.key
 		end
 		full_UI_table.name = localize{type = 'name', set = self.set, key = target.key or self.key, nodes = full_UI_table.name}
 		if res.main_start then
@@ -156,9 +188,9 @@ SMODS.D6_Side = SMODS.GameObject:extend {
 			local total_d6_sides = {}
 			for i = 1, #G.jokers.cards do
 				if (G.jokers.cards[i].debuff and not ignore_debuff) or not G.jokers.cards[i].config.center.d6_joker then
-				elseif G.jokers.cards[i].ability.extra.local_d6_sides[G.jokers.cards[i].ability.extra.selected_d6_face].key == die_side_key then 
+				elseif G.jokers.cards[i].ability.extra.local_d6_sides[G.jokers.cards[i].ability.extra.selected_d6_face] == die_side_key then 
 					total_d6_sides[#total_d6_sides+1] = {card = G.jokers.cards[i], side_config = SMODS.D6_Sides[G.jokers.cards[i].ability.extra.local_d6_sides[G.jokers.cards[i].ability.extra.selected_d6_face].key]}
-				elseif G.jokers.cards[i].ability.extra.local_d6_sides[G.jokers.cards[i].ability.extra.selected_d6_face].key == "chaos_side" and G.jokers.cards[i].ability.extra.local_d6_sides[G.jokers.cards[i].ability.extra.selected_d6_face].extra.selected_die_key == die_side_key then
+				elseif G.jokers.cards[i].ability.extra.local_d6_sides[G.jokers.cards[i].ability.extra.selected_d6_face].extra and G.jokers.cards[i].ability.extra.chaos_selected_die == die_side_key then
 					total_d6_sides[#total_d6_sides+1] = {card = G.jokers.cards[i], side_config = SMODS.D6_Sides[G.jokers.cards[i].ability.extra.chaos_selected_die]}
 				end
 			end
@@ -176,16 +208,14 @@ SMODS.D6_Side = SMODS.GameObject:extend {
 			edition = nil,
 		}
 
-		if gen_config.edition.forced_edition and G.P_D6_EDITIONS[gen_config.edition.forced_edition] then
+		if gen_config.edition.forced_edition then
 			local edi_config = copy_table(G.P_D6_EDITIONS[gen_config.edition.forced_edition])
 			target.edition = {key = edi_config.key, shaders = edi_config.shaders, config = edi_config.config}
 		elseif not gen_config.edition.no_edition then
 			local edition = poll_edition("d6_side_gen", nil, nil, gen_config.edition.guaranteed or false, {'e_polychrome', 'e_holo', 'e_foil'}) --base game editions
-			if edition and G.P_D6_EDITIONS[edition] then 
+			if edition then 
 				local edi_config = copy_table(G.P_D6_EDITIONS[edition])
 				target.edition = {key = edi_config.key, shaders = edi_config.shaders, config = edi_config.config}
-			elseif edition ~= nil and G.P_D6_EDITIONS[edition] == nil then
-				sendWarnMessage("D6 JOKERS | Failed to apply edition to D6 Side: "..tostring(edition)..". does not exist in P_D6_EDITIONS")
 			end
 		end
 
@@ -219,7 +249,7 @@ SMODS.D6_Joker = SMODS.Joker:extend {
 		self.config.extra["selected_d6_face"] = 1 
 	end,
 	loc_vars = function(self, info_queue, card)
-		if not card.debuff then
+		if not card.debuff and card.ability.extra.local_d6_sides[card.ability.extra.selected_d6_face] then
 			local total_die_faces = {}
 			for _, v in ipairs(card.ability.extra.local_d6_sides) do
 				if not total_die_faces[v.key] then total_die_faces[v.key] = v end
@@ -235,19 +265,19 @@ SMODS.D6_Joker = SMODS.Joker:extend {
 				local edition = G.P_D6_EDITIONS[card.ability.extra.local_d6_sides[card.ability.extra.selected_d6_face].edition.key]
 				if edition.loc_vars and type(edition.loc_vars) == 'function' then edition:loc_vars(info_queue, card, card.ability.extra.local_d6_sides[card.ability.extra.selected_d6_face].edition) end
 			end
-			if card.ability.extra.weighted_side then info_queue[#info_queue+1] = {key = "d6_joker_weighted", set = "Other", vars = {3*G.GAME.probabilities.normal, 4, card.ability.extra.weighted_side}} end
+			if card.ability.extra.cannot_reroll then info_queue[#info_queue+1] = {key = "d6_joker_weighted", set = "Other", vars = {}} end
 		end
 	end,
 	calculate = function(self, card, context)
 		if not card.debuff and not context.sdm_adding_card then --SDM_0 compat, we don't use it anyways
 			--D6 Joker logic
 			local d6_side = SMODS.D6_Sides[card.ability.extra.local_d6_sides[card.ability.extra.selected_d6_face].key]
-			if context.setting_blind and not card.getting_sliced and not context.blueprint_card then
+			if context.setting_blind and not card.getting_sliced and not context.blueprint_card and not card.ability.extra.cannot_reroll then
 				if d6_side.remove_from_deck and type(d6_side.remove_from_deck) == "function" then
 					d6_side:remove_from_deck(card, nil, {from_roll = true}, card.ability.extra.local_d6_sides[card.ability.extra.selected_d6_face])
 				end
 
-				card.ability.extra.selected_d6_face = math.clamp(1, math.round((card.ability.extra.weighted_side and pseudorandom('weighted_chance') < (G.GAME.probabilities.normal*3)/4) and card.ability.extra.weighted_side or pseudorandom("d6_joker"..card.config.center.key, 1, 6)), 6)
+				card.ability.extra.selected_d6_face = math.clamp(1, math.round(pseudorandom("d6_joker"..card.config.center.key, 1, 6)), 6)
 				card_eval_status_text(card, 'extra', nil, nil, nil, {message = localize{type='variable',key='d6_joker_roll',vars={card.ability.extra.selected_d6_face}}, colour = G.C.BLUE})
 
 				if #SMODS.find_card("j_oops") > 0 and card.ability.extra.selected_d6_face ~= 6 then 
@@ -292,17 +322,11 @@ SMODS.D6_Joker = SMODS.Joker:extend {
 		end
 	end,
 	update = function(self, card, dt)
-		if card.ability.extra.selected_d6_face % 1 > 0 then card.ability.extra.selected_d6_face = math.round(card.ability.extra.selected_d6_face) end
-		if card.ability.extra.selected_d6_face < 0 then card.ability.extra.selected_d6_face = card.ability.extra.selected_d6_face*-1 end
-		card.ability.extra.selected_d6_face = math.clamp(1, card.ability.extra.selected_d6_face, 6)
 		if G.jokers and card.ability.extra.local_d6_sides[card.ability.extra.selected_d6_face] then
 			local d6_side = SMODS.D6_Sides[card.ability.extra.local_d6_sides[card.ability.extra.selected_d6_face].key]
 			if d6_side.update and type(d6_side.update) == "function" then
 				d6_side:update(card, dt, card.ability.extra.local_d6_sides[card.ability.extra.selected_d6_face])
 			end
-		elseif card.ability.extra.local_d6_sides[card.ability.extra.selected_d6_face] == nil then
-			sendWarnMessage("D6 Joker does not have local_d6_sides info. Printing extra now: ")
-			print(tprint(card.ability.extra))
 		end
 	end,
 }
@@ -383,9 +407,88 @@ end
 function math.clamp(low, n, high) return math.min(math.max(low, n), high) end
 function math.round(n, deci) deci = 10^(deci or 0) return math.floor(n*deci+.5)/deci end
 
+--[[
+SMODS.current_mod.custom_collection_tabs = function()
+	return { UIBox_button {
+        count = G.ACTIVE_MOD_UI and modsCollectionTally(G.P_CENTER_POOLS['D6 Side']), --Returns nil outside of G.ACTIVE_MOD_UI but we don't use it anyways
+        button = 'your_collection_sides', label = {"Sides"}, count = G.ACTIVE_MOD_UI and modsCollectionTally(G.P_CENTER_POOLS['D6 Side']), minw = 5, id = 'your_collection_sides'
+    }}
+end
+
+function create_UIBox_Sides()
+    local deck_tables = {}
+
+    G.your_collection = {}
+    for j = 1, 4 do
+      G.your_collection[j] = CardArea(
+        G.ROOM.T.x + 0.2*G.ROOM.T.w/2,G.ROOM.T.h,
+        (5.25)*G.CARD_W,
+        1*G.CARD_W, 
+        {card_limit = 5, type = 'title', highlight_limit = 0, collection = true})
+      table.insert(deck_tables, 
+      {n=G.UIT.R, config={align = "cm", padding = 0, no_fill = true}, nodes={
+        {n=G.UIT.O, config={object = G.your_collection[j]}}
+      }}
+      )
+    end
+
+    local tarot_options = {}
+    for i = 1, math.ceil(#G.P_CENTER_POOLS['D6 Side']/20) do
+      table.insert(tarot_options, localize('k_page')..' '..tostring(i)..'/'..tostring(math.ceil(#G.P_CENTER_POOLS['D6 Side']/20)))
+    end
+  
+    for j = 1, #G.your_collection do
+        for i = 1, 5 do
+            local center = G.P_CENTER_POOLS['D6 Side'][i+(j-1)*(5)]
+            if (i+(j-1)*(5)) <= #G.P_CENTER_POOLS['D6 Side'] then
+                local card = Card(G.your_collection[j].T.x + G.your_collection[j].T.w/2, G.your_collection[j].T.y, G.CARD_W, G.CARD_H, nil, center)
+                card:start_materialize(nil, i>1 or j>1)
+                G.your_collection[j]:emplace(card)
+            end
+        end
+    end
+  
+    INIT_COLLECTION_CARD_ALERTS()
+    
+    local t = create_UIBox_generic_options({ back_func = G.ACTIVE_MOD_UI and "openModUI_"..G.ACTIVE_MOD_UI.id or 'your_collection', contents = {
+              {n=G.UIT.R, config={align = "cm", minw = 2.5, padding = 0.1, r = 0.1, colour = G.C.BLACK, emboss = 0.05}, nodes=deck_tables},
+                    {n=G.UIT.R, config={align = "cm"}, nodes={
+                      create_option_cycle({options = tarot_options, w = 4.5, cycle_shoulders = true, opt_callback = 'your_collection_sides_page', focus_args = {snap_to = true, nav = 'wide'},current_option = 1, colour = G.C.RED, no_pips = true})
+                    }}
+            }})
+    return t
+end
+
+G.FUNCS.your_collection_sides_page = function(args)
+    if not args or not args.cycle_config then return end
+    for j = 1, #G.your_collection do
+        for i = #G.your_collection[j].cards,1, -1 do
+            local c = G.your_collection[j]:remove_card(G.your_collection[j].cards[i])
+            c:remove()
+            c = nil
+        end
+    end
+    for i = 1, 5 do
+        for j = 1, #G.your_collection do
+            local center = G.P_CENTER_POOLS['D6 Side'][i+(j-1)*5 + (5*#G.your_collection*(args.cycle_config.current_option - 1))]
+            if not center then break end
+            local card = Card(G.your_collection[j].T.x + G.your_collection[j].T.w/2, G.your_collection[j].T.y, G.CARD_W, G.CARD_H, G.P_CARDS.empty, center)
+            G.your_collection[j]:emplace(card)
+        end
+    end
+    INIT_COLLECTION_CARD_ALERTS()
+end]]
+
 SMODS.current_mod.custom_collection_tabs = function()
 	return {
-		UIBox_button({button = 'your_collection_d6_sides', label = {localize('b_d6_sides')}, count = G.ACTIVE_MOD_UI and modsCollectionTally(G.P_D6_SIDES) or G.DISCOVER_TALLIES.d6_sides, minw = 5, minh = 2.0, id = 'your_collection_d6_sides', focus_args = {snap_to = true}})
+		UIBox_button({
+			button = 'your_collection_d6_sides',
+			label = {localize('b_d6_sides')},
+			count = G.ACTIVE_MOD_UI and modsCollectionTally(G.P_D6_SIDES) or G.DISCOVER_TALLIES.d6_sides,
+			minw = 5, minh = 2.0,
+			id = 'your_collection_d6_sides',
+			focus_args = {snap_to = true}})
+			
 	}
 end
 
