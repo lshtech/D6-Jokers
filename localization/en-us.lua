@@ -98,9 +98,8 @@ return {
 			["d6_joker_weighted"] = {
 				["name"] = "Weighted",
 				["text"] = {
-					"This D6 Joker has",
-					"a {C:green}#1# in #2#{} to",
-					"roll {C:attention}#3#"
+					"This D6 Joker cannot",
+					"change selected {C:attention}D6 Side"
 				},
 			},
 		},
@@ -265,7 +264,7 @@ return {
 				},
 			},
 			["j_dsix_interstellar_plus_die"] = {
-				["name"] = "Interstellar Die+",
+				["name"] = "Interstellar Die",
 				["text"] = {
 					"A functioning space ship in",
 					"the shape of a die",
@@ -358,8 +357,8 @@ return {
 			["c_dsix_weighted"] = {
 				["name"] = "Weighted",
 				["text"] = {
-					"Selected {C:attention}D6 Joker{}",
-					"becomes {C:attention}Weighted",
+					"Selected {C:attention}D6 Joker{} cannot",
+					"change selected {C:attention}D6 Side",
 				},
 			},
 		},
@@ -723,7 +722,8 @@ return {
 				["label"] = "Moon",
 				["name"] = "{C:attention}Moon{}",
 				["text"] = {
-					"{C:attention}Upgrade random poker hand by", 
+					"{C:attention}Upgrade random poker hand", 
+					"{C:attention}random poker hand by",
 					"{C:attention}#1# when rolled",
 				},
 			},
