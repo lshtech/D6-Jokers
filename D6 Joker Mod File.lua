@@ -378,8 +378,12 @@ end
 --Basic support for Foil/Holo/Poly
 local get_edition_ref = Card.get_edition
 function Card:get_edition()
-	local orig_ret = get_edition_ref(self) or {card = self}
+	local orig_ret = get_edition_ref(self) --or {card = self}
 	if self.ability.set == "Joker" and self.ability.extra and type(self.ability.extra) == 'table' and self.ability.extra.local_d6_sides and self.ability.extra.local_d6_sides[self.ability.extra.selected_d6_face].edition then
+		if not orig_ret then
+			orig_ret = {card = self}
+			orig_ret.card.edition = {}
+		end
 		local edition = self.ability.extra.local_d6_sides[self.ability.extra.selected_d6_face].edition
 		if edition.config.xmult then
 			orig_ret.x_mult_mod = (orig_ret.x_mult_mod or 1) * edition.config.xmult
