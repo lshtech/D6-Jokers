@@ -151,11 +151,9 @@ SMODS.D6_Side = SMODS.GameObject:extend {
 		})
 	end,
 	generate_ui = function(self, info_queue, card, desc_nodes, specific_vars, full_UI_table)
-		local target = { type = 'descriptions', key = self.key, set = self.set, nodes = desc_nodes, vars =
-		specific_vars }
+		local target = { type = 'descriptions', key = self.key, set = self.set, nodes = desc_nodes, vars = specific_vars or {} }
 		local res = {}
 		if self.loc_vars and type(self.loc_vars) == 'function' then
-			print(card.name)
 			--res = self:loc_vars(info_queue, card, card.ability.extra.local_d6_sides[card.ability.extra.selected_d6_face])
 			--target.vars = res.vars or target.vars
 			--target.key = res.key or target.key
